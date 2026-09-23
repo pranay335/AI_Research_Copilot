@@ -26,6 +26,7 @@ def search_news(query: str) -> str:
     for article in feed.entries[:5]:
         title = article.get("title", "No title")
         published = article.get("published", "Unknown date")
+        link = article.get("link", "No URL")
 
         source = "Unknown source"
 
@@ -35,7 +36,8 @@ def search_news(query: str) -> str:
         results.append(
             f"Title: {title}\n"
             f"Source: {source}\n"
-            f"Published: {published}"
+            f"Published: {published}\n"
+            f"URL: {link}"
         )
 
     return "\n\n---\n\n".join(results)
