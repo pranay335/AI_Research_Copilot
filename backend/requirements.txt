@@ -6,4 +6,6 @@ langchain-groq
 feedparser
 trafilatura
 requests
-pip install nltk
+nltk
+numpy
+scikit-learn

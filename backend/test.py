@@ -1,7 +1,6 @@
 import json
 
-from nlp.preprocessing.preprocess import preprocess_text
-from nlp.analysis.pos_tagging import get_pos_tags
+from nlp.analysis.similarity import calculate_similarity
 
 
 # Load static articles
@@ -9,25 +8,23 @@ with open("data/articles.json", "r", encoding="utf-8") as file:
     articles = json.load(file)
 
 
-# Use the first article
-article = articles[0]
+# Select two articles
+article1 = articles[0]
+article2 = articles[1]
+
 
 # Get article content
-text = article["content"]
+text1 = article1["content"]
+text2 = article2["content"]
 
 
-# Run preprocessing
-result = preprocess_text(text)
-
-# Get filtered tokens
-tokens = result["filtered_tokens"]
+# Calculate similarity
+score = calculate_similarity(text1, text2)
 
 
-# POS tagging
-pos_tags = get_pos_tags(tokens)
+print("\n===== TEXT SIMILARITY =====")
 
+print(f"Article 1: {article1['title']}")
+print(f"Article 2: {article2['title']}")
 
-print("\n===== POS TAGGING =====")
-
-for word, tag in pos_tags:
-    print(f"{word} -> {tag}")
+print(f"\nSimilarity Score: {score:.4f}")
