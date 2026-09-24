@@ -19,6 +19,7 @@ from intelligence.research_engine import (
 )
 from intelligence.article_analyzer import analyze_article
 from memory.memory import initialize_database, get_research_history, save_research
+from agent.agent import graph as agent_graph
 
 # Initialize database on startup
 initialize_database()
@@ -124,6 +125,20 @@ if st.button("Research"):
                 ]
                 save_research(query, topic_labels, article_refs)
 
+                # -----------------------------------------------
+                # 6. Get LLM answer using the existing agent
+                # -----------------------------------------------
+                agent_answer = ""
+                try:
+                    agent_response = agent_graph.invoke(
+                        {"messages": [("user", query)]}
+                    )
+                    for msg in agent_response.get("messages", []):
+                        if getattr(msg, "content", None):
+                            agent_answer = msg.content
+                except Exception:
+                    agent_answer = ""
+
                 # Store everything in session state
                 st.session_state.last_query = query
                 st.session_state.results = {
@@ -131,6 +146,7 @@ if st.button("Research"):
                     "top_article_analysis": top_article_analysis,
                     "related": related,
                     "trends": trends,
+                    "agent_answer": agent_answer,
                 }
 
             except Exception as e:
@@ -145,6 +161,7 @@ if st.session_state.results:
     top_article_analysis = r["top_article_analysis"]
     related = r["related"]
     trends = r["trends"]
+    agent_answer = r.get("agent_answer", "")
 
     st.markdown(f"### Results for: *{st.session_state.last_query}*")
     st.markdown("---")
@@ -258,3 +275,13 @@ if st.session_state.results:
                         st.markdown(f"- Article {a['id']}: {a['title']}")
     else:
         st.info("No research history yet.")
+
+    # -----------------------------------------------
+    # Section 6: Research Answer (LLM via LangGraph)
+    # -----------------------------------------------
+    st.markdown("---")
+    st.subheader("Research Answer (LangGraph Agent)")
+    if agent_answer:
+        st.markdown(agent_answer)
+    else:
+        st.info("No agent answer available.")
